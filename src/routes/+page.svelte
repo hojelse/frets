@@ -54,14 +54,12 @@
 			"color": "#CC8F53"
 		}
 	}
+	let fret_count = 18;
+	let strings_tuning = [0, 7, 3, 10, 5, 0];
 
-	let grid: number[] = [];
-	let tuning_degrees = [0, 5, 10, 3, 7, 0].reverse();
-	for (let i = 0; i < tuning_degrees.length; i++) {
-		for (let j = 0; j < 18; j++) {
-			grid.push((tuning_degrees[i] + j) % 12);
-		}
-	}
+	$: grid = strings_tuning.map(tuning => 
+		Array.from({length: fret_count}, (_, j) => (tuning + j) % 12)
+	);
 
 	let key = "111111111111";
 
@@ -73,61 +71,134 @@
 	}
 
 	let degrees_to_chord_name: { [key: string]: string } = {
+		"111111111111": "Chromatic Scale",
+		// "101011010101": "Diatonic Scale",
+		// "101010010100": "Major Pentatonic Scale",
+		// "100101010010": "Minor Pentatonic Scale",
+		// "101101010101": "Melodic Minor Scale",
+		// "101101011001": "Harmonic Minor Scale",
+		// "101010101010": "Whole-tone scale",
 		"100010010000": "M",
 		"100010010100": "6",
 		"100010010010": "7",
 		"101010010010": "9",
 		"101011010010": "11",
+		"101011010110": "13",
 		"100010010001": "maj7",
-		"100010001000": "aug",
-		"100010001010": "aug7",
+		"101010010001": "maj9",
 		"100100010000": "m",
 		"100100010100": "m6",
 		"100100010010": "m7",
+		"101100010010": "m9",
+		"101101010010": "m11",
+		"101101010110": "m13",
 		"100100010001": "min/maj7",
+		"101100010001": "min/maj9",
 		"100100100000": "dim",
 		"100100100100": "dim7",
-		"100100100010": "ø",
+		"100100100010": "half-dim",
+		"100010001000": "aug",
+		"100010001010": "aug7",
+		"101000010000": "sus2",
+		"100001010000": "sus4",
+		"100001010010": "7sus4",
+		"101001010000": "sus4 add9",
+		"101010010000": "add9",
+		"101100010000": "m add9",
+		"100010010110": "7add6",
+		"100000010000": "omit3",
+		"100000010010": "7omit3",
+		"100010000000": "omit5",
+		"100010100010": "7(b5)",
+		"110010010010": "7(b9)",
+		"100110010010": "7(#9)",
+		"101010110010": "7(#11)",
+		"110010011010": "7(b9b13)",
+		"100100011010": "m7(b13)",
+		"110110101010": "7alt",
 	}
 
+	function openTuningModal(idx: number): any {
+		strings_tuning[idx] = (strings_tuning[idx] + 1) % 12;
+		strings_tuning = strings_tuning; // trigger reactivity
+		grid = grid; // trigger reactivity
+	}
 </script>
 
 <div class="page">
-	<div class="chord-name">
-		{#if key in degrees_to_chord_name}
-			{degrees_to_chord_name[key]}
-		{/if}
+	<div class="fret-controls">
+		<button 
+			class="fret-button"
+			on:click={() => {
+				if (fret_count > 1) {
+					fret_count--;
+					strings_tuning = strings_tuning; // trigger reactivity
+					grid = grid; // trigger reactivity
+				}
+			}}
+		>
+			Decrease Frets
+		</button>
+		<button
+			class="fret-button" 
+			on:click={() => {
+				fret_count++;
+				strings_tuning = strings_tuning; // trigger reactivity
+				grid = grid; // trigger reactivity
+			}}
+		>
+			Increase Frets
+		</button>
 	</div>
 
-	<div class="scale-selector">
-		{#each Object.entries(scale_degrees) as [index, degree]}
-			<label class="scale-checkbox">
-				<input
-					type="checkbox"
-					checked={key[parseInt(index)] === "1"}
-					on:change={() => toggleDegree(parseInt(index))}
-					style:display="none"
-				/>
-				<div 
-					style:background-color={!(key[parseInt(index)] === "1") ? "transparent" : degree.color}
-					class="circle"
-				>
-					{degree.short_name}
+	<div class="guitar-container">
+		<div class="tuning-container">
+			{#each strings_tuning as id, idx}
+				<label class="scale-checkbox">
+					<input
+						type="checkbox"
+						checked={key[id] === "1"}
+						on:change={() => openTuningModal(idx)}
+						style:display="none"
+					/>
+					<div 
+						style:border={`1px solid ${scale_degrees[id].color}`}
+						class="circle"
+					>
+						{scale_degrees[id].short_name}
+					</div>
+				</label>
+			{/each}
+		</div>
+		<div class="circle-container">
+			{#each grid as string}
+				<div class="string">
+					{#each string as id}
+						<label class="scale-checkbox">
+							<input
+								type="checkbox"
+								checked={key[id] === "1"}
+								on:change={() => toggleDegree(id)}
+								style:display="none"
+							/>
+							<div
+								style:background-color={!(key[id] === "1") ? "transparent" : scale_degrees[id].color}
+								class="circle"
+							>
+								{scale_degrees[id].short_name}
+							</div>
+						</label>
+					{/each}
 				</div>
-			</label>
-		{/each}
+			{/each}
+			<div class="chord-name">
+				{#if key in degrees_to_chord_name}
+					{degrees_to_chord_name[key]}
+				{/if}
+			</div>
+		</div>
 	</div>
 
-	<div class="circle-container">
-		{#each grid as id}
-			<div 
-				class="circle"
-				style:background-color={!(key[id] === "1") ? "transparent" : scale_degrees[id].color}
-			>
-				{scale_degrees[id].short_name}
-			</div>
-		{/each}
-	</div>
 </div>
 
 <style>
@@ -152,11 +223,32 @@
 		padding: 0;
 	}
 
+	.guitar-container {
+		display: flex;
+		flex-direction: row;
+	}
+
 	.circle-container {
 		display: grid;
-		grid-template-columns: repeat(18, 25px);
 		grid-template-rows: repeat(6, 25px);
-		gap: 4px;
+		gap: 10px;
+		justify-content: center;
+		padding: 1rem;
+	}
+
+	.string {
+		display: grid;
+		grid-template-columns: repeat(24, 25px);
+		gap: 10px;
+		justify-content: center;
+		user-select: none;
+	}
+	
+	.tuning-container {
+		display: grid;
+		grid-template-columns: repeat(1, 25px);
+		grid-template-rows: repeat(6, 25px);
+		gap: 10px;
 		justify-content: center;
 		padding: 1rem;
 		user-select: none;
