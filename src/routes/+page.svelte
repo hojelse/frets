@@ -1,4 +1,33 @@
 <script lang="ts">
+	import { onMount } from 'svelte';
+
+	// Default values
+	let tuning = "073a50";
+	let key = "100010010000";
+
+	onMount(() => {
+		const urlParams = new URLSearchParams(window.location.search);
+		tuning = urlParams.get('tuning') || tuning;
+		key = urlParams.get('key') || key;
+	});
+
+	// URL handling
+	function updateURL() {
+		if (typeof window !== 'undefined') {
+			const params = new URLSearchParams();
+			params.set('tuning', tuning);
+			params.set('key', key);
+			window.history.replaceState({}, '', `?${params.toString()}`);
+		}
+	}
+
+	// Watch for changes and update URL
+	$: {
+		tuning;
+		key;
+		updateURL();
+	}
+
 	interface ScaleDegree {
 		short_name: string;
 		color: string;
@@ -55,13 +84,17 @@
 		}
 	}
 	let fret_count = 18;
-	let strings_tuning = [0, 7, 3, 10, 5, 0];
+	// let tuning = "073a50";
 
-	$: grid = strings_tuning.map(tuning => 
+	let tuning_hex_to_array = (tuning: string) => {
+		return tuning.split('').map(char => parseInt(char, 16));
+	}
+
+	$: grid = tuning_hex_to_array(tuning).map(tuning => 
 		Array.from({length: fret_count}, (_, j) => (tuning + j) % 12)
 	);
 
-	let key = "111111111111";
+	// let key = "100010010000";
 
 	function toggleDegree(index: number) {
 		const keyArray = key.split('');
@@ -70,95 +103,175 @@
 		key = key; // trigger reactivity
 	}
 
-	let degrees_to_chord_name: { [key: string]: string } = {
-		"111111111111": "Chromatic Scale",
-		// "101011010101": "Diatonic Scale",
-		// "101010010100": "Major Pentatonic Scale",
-		// "100101010010": "Minor Pentatonic Scale",
-		// "101101010101": "Melodic Minor Scale",
-		// "101101011001": "Harmonic Minor Scale",
-		// "101010101010": "Whole-tone scale",
-		"100010010000": "M",
-		"100010010100": "6",
-		"100010010010": "7",
-		"101010010010": "9",
-		"101011010010": "11",
-		"101011010110": "13",
-		"100010010001": "maj7",
-		"101010010001": "maj9",
-		"100100010000": "m",
-		"100100010100": "m6",
-		"100100010010": "m7",
-		"101100010010": "m9",
-		"101101010010": "m11",
-		"101101010110": "m13",
-		"100100010001": "min/maj7",
-		"101100010001": "min/maj9",
-		"100100100000": "dim",
-		"100100100100": "dim7",
-		"100100100010": "half-dim",
-		"100010001000": "aug",
-		"100010001010": "aug7",
-		"101000010000": "sus2",
-		"100001010000": "sus4",
-		"100001010010": "7sus4",
-		"101001010000": "sus4 add9",
-		"101010010000": "add9",
-		"101100010000": "m add9",
-		"100010010110": "7add6",
-		"100000010000": "omit3",
-		"100000010010": "7omit3",
-		"100010000000": "omit5",
-		"100010100010": "7(b5)",
-		"110010010010": "7(b9)",
-		"100110010010": "7(#9)",
-		"101010110010": "7(#11)",
-		"110010011010": "7(b9b13)",
-		"100100011010": "m7(b13)",
-		"110110101010": "7alt",
+	let key_to_name: { [key: string]: { name: string } } = {
+		"111111111111": {
+			"name": "Chromatic Scale"
+		},
+		"101010010100": { 
+			"name": "Major Pentatonic Scale"
+		},
+		"101011010101": { 
+			"name": "Major Scale"
+		},
+		"100101010010": { 
+			"name": "Minor Pentatonic Scale"
+		},
+		"101101011010": { 
+			"name": "(Natural) Minor Scale"
+		},
+		"101101010101": { 
+			"name": "Melodic Minor Scale"
+		},
+		"101101011001": { 
+			"name": "Harmonic Minor Scale"
+		},
+		"101010101010": { 
+			"name": "Whole-tone scale"
+		},
+		"100010010000": { 
+			"name": "Major Triad"
+		},
+		"100010010100": { 
+			"name": "6"
+		},
+		"100010010010": { 
+			"name": "7"
+		},
+		"101010010010": { 
+			"name": "9"
+		},
+		"101011010010": { 
+			"name": "11"
+		},
+		"101011010110": { 
+			"name": "13"
+		},
+		"100010010001": { 
+			"name": "maj7"
+		},
+		"101010010001": { 
+			"name": "maj9"
+		},
+		"100100010000": { 
+			"name": "m"
+		},
+		"100100010100": { 
+			"name": "m6"
+		},
+		"100100010010": { 
+			"name": "m7"
+		},
+		"101100010010": { 
+			"name": "m9"
+		},
+		"101101010010": { 
+			"name": "m11"
+		},
+		"101101010110": { 
+			"name": "m13"
+		},
+		"100100010001": { 
+			"name": "min/maj7"
+		},
+		"101100010001": { 
+			"name": "min/maj9"
+		},
+		"100100100000": { 
+			"name": "dim"
+		},
+		"100100100100": { 
+			"name": "dim7"
+		},
+		"100100100010": { 
+			"name": "half-dim"
+		},
+		"100010001000": { 
+			"name": "aug"
+		},
+		"100010001010": { 
+			"name": "aug7"
+		},
+		"101000010000": { 
+			"name": "sus2"
+		},
+		"100001010000": { 
+			"name": "sus4"
+		},
+		"100001010010": { 
+			"name": "7sus4"
+		},
+		"101001010000": { 
+			"name": "sus4 add9"
+		},
+		"101010010000": { 
+			"name": "add9"
+		},
+		"101100010000": { 
+			"name": "m add9"
+		},
+		"100010010110": { 
+			"name": "7add6"
+		},
+		"100000010000": { 
+			"name": "omit3"
+		},
+		"100000010010": { 
+			"name": "7omit3"
+		},
+		"100010000000": { 
+			"name": "omit5"
+		},
+		"100010100010": { 
+			"name": "7(b5)"
+		},
+		"110010010010": { 
+			"name": "7(b9)"
+		},
+		"100110010010": { 
+			"name": "7(#9)"
+		},
+		"101010110010": { 
+			"name": "7(#11)"
+		},
+		"110010011010": { 
+			"name": "7(b9b13)"
+		},
+		"100100011010": { 
+			"name": "m7(b13)"
+		},
+		"110110101010": { 
+			"name": "7alt"
+		},
+	}
+	function retune(idx: number): void {
+		const newValue = ((parseInt(tuning[idx], 16) + 1) % 12).toString(16);
+		tuning[idx].replace(tuning[idx], newValue);
+		tuning = tuning; // trigger reactivity
+		grid = grid; // trigger reactivity
 	}
 
-	function openTuningModal(idx: number): any {
-		strings_tuning[idx] = (strings_tuning[idx] + 1) % 12;
-		strings_tuning = strings_tuning; // trigger reactivity
-		grid = grid; // trigger reactivity
+	let showModal = false;
+
+	function addString() {
+		tuning = tuning + "0";
+	}
+
+	function removeString() {
+		if (tuning.length > 1) {
+			tuning = tuning.slice(0, -1);
+		}
 	}
 </script>
 
 <div class="page">
-	<div class="fret-controls">
-		<button 
-			class="fret-button"
-			on:click={() => {
-				if (fret_count > 1) {
-					fret_count--;
-					strings_tuning = strings_tuning; // trigger reactivity
-					grid = grid; // trigger reactivity
-				}
-			}}
-		>
-			Decrease Frets
-		</button>
-		<button
-			class="fret-button" 
-			on:click={() => {
-				fret_count++;
-				strings_tuning = strings_tuning; // trigger reactivity
-				grid = grid; // trigger reactivity
-			}}
-		>
-			Increase Frets
-		</button>
-	</div>
-
 	<div class="guitar-container">
 		<div class="tuning-container">
-			{#each strings_tuning as id, idx}
+			{#each tuning_hex_to_array(tuning) as id, idx}
 				<label class="scale-checkbox">
 					<input
 						type="checkbox"
 						checked={key[id] === "1"}
-						on:change={() => openTuningModal(idx)}
+						on:change={() => retune(idx)}
 						style:display="none"
 					/>
 					<div 
@@ -191,24 +304,78 @@
 					{/each}
 				</div>
 			{/each}
-			<div class="chord-name">
-				{#if key in degrees_to_chord_name}
-					{degrees_to_chord_name[key]}
-				{/if}
-			</div>
 		</div>
 	</div>
 
+	<div class="controls">
+		<div class="fret-controls">
+			<button class="control-button" on:click={() => fret_count > 1 && fret_count--}>
+				Decrease Frets
+			</button>
+			<button class="control-button" on:click={() => fret_count++}>
+				Increase Frets
+			</button>
+		</div>
+		<div class="string-controls">
+			<button class="control-button" on:click={removeString}>
+				Decrease Strings
+			</button>
+			<button class="control-button" on:click={addString}>
+				Increase Strings
+			</button>
+		</div>
+	</div>
+
+	<div class="chord-name">
+		Key:
+		{ key_to_name[key].name ?? "unknown" }
+		<button class="modal-button" on:click={() => showModal = true}>Change Key</button>
+	</div>
+
+	{#if showModal}
+		<div 
+			class="modal-backdrop" 
+			on:click={() => showModal = false}
+			on:keydown={() => showModal = false}
+			role="button"
+			tabindex="0"
+		>
+			<div 
+				class="modal-content" 
+				on:click|stopPropagation 
+				on:keydown|stopPropagation
+				role="dialog"
+				tabindex="0"
+			>
+				<div class="scale-selector">
+					<h2>Select Scale or Chord</h2>
+					{#each Object.entries(key_to_name) as [degrees, o]}
+						<label class="scale-checkbox">
+							<input
+								type="radio" 
+								name="chord"
+								checked={key === degrees}
+								on:change={() => {
+									key = degrees;
+									showModal = false;
+								}}
+								style:display="none"
+							/>
+							<div class="chord-button" class:selected={key === degrees}>
+								{o.name}
+							</div>
+						</label>
+					{/each}
+				</div>
+			</div>
+		</div>
+	{/if}
 </div>
 
 <style>
 	.scale-selector {
-		display: flex;
-		gap: 8px;
-		flex-wrap: wrap;
-		justify-content: center;
-		margin-bottom: 1rem;
 		user-select: none;
+		color: white;
 	}
 
 	.scale-checkbox {
@@ -270,6 +437,82 @@
 		font-size: 1.5em;
 		font-weight: bold;
 		color: white;
-		text-align: center;
+	}
+
+	.modal-backdrop {
+		position: fixed;
+		top: 0;
+		left: 0;
+		width: 100%;
+		height: 100%;
+		background: rgba(0, 0, 0, 0.5);
+		display: flex;
+		justify-content: center;
+		align-items: center;
+		z-index: 1000;
+	}
+
+	.modal-content {
+		background: #424242;
+		padding: 2rem;
+		border-radius: 8px;
+		max-height: 80vh;
+		overflow-y: auto;
+		width: 80%;
+		max-width: 500px;
+	}
+
+	.modal-button {
+		background: #525252;
+		border: none;
+		color: white;
+		padding: 0.5rem 1rem;
+		border-radius: 4px;
+		cursor: pointer;
+		margin-left: 1rem;
+	}
+
+	.chord-button {
+		padding: 0.5rem 1rem;
+		margin: 0.25rem;
+		border-radius: 4px;
+		background: #525252;
+		color: white;
+		cursor: pointer;
+	}
+
+	.chord-button.selected {
+		background: #727272;
+	}
+
+	.scale-selector {
+		display: flex;
+		flex-direction: column;
+		gap: 0.5rem;
+	}
+
+	h2 {
+		color: white;
+		margin-top: 0;
+	}
+
+	.controls {
+		display: flex;
+		gap: 1rem;
+		justify-content: center;
+		margin: 1rem;
+	}
+
+	.control-button {
+		background: #525252;
+		border: none;
+		color: white;
+		padding: 0.5rem 1rem;
+		border-radius: 4px;
+		cursor: pointer;
+	}
+
+	.control-button:hover {
+		background: #626262;
 	}
 </style>
