@@ -5,29 +5,6 @@
 	let tuning = "073a50";
 	let key = "100010010000";
 
-	onMount(() => {
-		const urlParams = new URLSearchParams(window.location.search);
-		tuning = urlParams.get('tuning') || tuning;
-		key = urlParams.get('key') || key;
-	});
-
-	// URL handling
-	function updateURL() {
-		if (typeof window !== 'undefined') {
-			const params = new URLSearchParams();
-			params.set('tuning', tuning);
-			params.set('key', key);
-			window.history.replaceState({}, '', `?${params.toString()}`);
-		}
-	}
-
-	// Watch for changes and update URL
-	$: {
-		tuning;
-		key;
-		updateURL();
-	}
-
 	interface ScaleDegree {
 		short_name: string;
 		color: string;
@@ -83,8 +60,7 @@
 			"color": "#CC8F53"
 		}
 	}
-	let fret_count = 18;
-	// let tuning = "073a50";
+	let fret_count = 24;
 
 	let tuning_hex_to_array = (tuning: string) => {
 		return tuning.split('').map(char => parseInt(char, 16));
@@ -93,8 +69,6 @@
 	$: grid = tuning_hex_to_array(tuning).map(tuning => 
 		Array.from({length: fret_count}, (_, j) => (tuning + j) % 12)
 	);
-
-	// let key = "100010010000";
 
 	function toggleDegree(index: number) {
 		const keyArray = key.split('');
@@ -243,12 +217,7 @@
 			"name": "7alt"
 		},
 	}
-	function retune(idx: number): void {
-		const newValue = ((parseInt(tuning[idx], 16) + 1) % 12).toString(16);
-		tuning[idx].replace(tuning[idx], newValue);
-		tuning = tuning; // trigger reactivity
-		grid = grid; // trigger reactivity
-	}
+
 
 	let showModal = false;
 
@@ -265,24 +234,6 @@
 
 <div class="page">
 	<div class="guitar-container">
-		<div class="tuning-container">
-			{#each tuning_hex_to_array(tuning) as id, idx}
-				<label class="scale-checkbox">
-					<input
-						type="checkbox"
-						checked={key[id] === "1"}
-						on:change={() => retune(idx)}
-						style:display="none"
-					/>
-					<div 
-						style:border={`1px solid ${scale_degrees[id].color}`}
-						class="circle"
-					>
-						{scale_degrees[id].short_name}
-					</div>
-				</label>
-			{/each}
-		</div>
 		<div class="circle-container">
 			{#each grid as string}
 				<div class="string">
@@ -307,28 +258,15 @@
 		</div>
 	</div>
 
-	<div class="controls">
-		<div class="fret-controls">
-			<button class="control-button" on:click={() => fret_count > 1 && fret_count--}>
-				Decrease Frets
-			</button>
-			<button class="control-button" on:click={() => fret_count++}>
-				Increase Frets
-			</button>
-		</div>
-		<div class="string-controls">
-			<button class="control-button" on:click={removeString}>
-				Decrease Strings
-			</button>
-			<button class="control-button" on:click={addString}>
-				Increase Strings
-			</button>
-		</div>
-	</div>
-
 	<div class="chord-name">
-		Key:
-		{ key_to_name[key].name ?? "unknown" }
+		<div class="chord-name-text">
+			Key:
+			{#if key_to_name[key]}
+				{ key_to_name[key].name }
+			{:else}
+				Unknown
+			{/if}
+		</div>
 		<button class="modal-button" on:click={() => showModal = true}>Change Key</button>
 	</div>
 
@@ -344,7 +282,7 @@
 				class="modal-content" 
 				on:click|stopPropagation 
 				on:keydown|stopPropagation
-				role="dialog"
+				role="button"
 				tabindex="0"
 			>
 				<div class="scale-selector">
@@ -363,6 +301,18 @@
 							/>
 							<div class="chord-button" class:selected={key === degrees}>
 								{o.name}
+								<div class="chord-degrees-container">
+									{#each degrees.split('') as x, idx}
+										{#if x === "1"}
+											<div
+												style:background-color={!(x === "1") ? "transparent" : scale_degrees[idx].color}
+												class="circle"
+										>
+											{scale_degrees[idx].short_name}
+											</div>
+										{/if}
+									{/each}
+								</div>
 							</div>
 						</label>
 					{/each}
@@ -410,16 +360,6 @@
 		justify-content: center;
 		user-select: none;
 	}
-	
-	.tuning-container {
-		display: grid;
-		grid-template-columns: repeat(1, 25px);
-		grid-template-rows: repeat(6, 25px);
-		gap: 10px;
-		justify-content: center;
-		padding: 1rem;
-		user-select: none;
-	}
 
 	.circle {
 		width: 25px;
@@ -431,12 +371,6 @@
 		font-weight: bold;
 		font-size: 0.8em;
 		user-select: none;
-	}
-
-	.chord-name {
-		font-size: 1.5em;
-		font-weight: bold;
-		color: white;
 	}
 
 	.modal-backdrop {
@@ -472,6 +406,20 @@
 		margin-left: 1rem;
 	}
 
+	.chord-name {
+		display: flex;
+		flex-direction: row;
+	}
+
+	.chord-name-text {
+		background: none;
+		border: 2px solid #525252;
+		color: white;
+		padding: 0.5rem 1rem;
+		border-radius: 4px;
+		margin-left: 1rem;
+	}
+
 	.chord-button {
 		padding: 0.5rem 1rem;
 		margin: 0.25rem;
@@ -479,6 +427,18 @@
 		background: #525252;
 		color: white;
 		cursor: pointer;
+		display: flex;
+		flex-direction: row;
+		gap: 0.5rem;
+		width: 100%;
+		justify-content: space-between;
+	}
+
+	.chord-degrees-container {
+		display: flex;
+		flex-direction: row;
+		flex-wrap: wrap;
+		gap: 0.5rem;
 	}
 
 	.chord-button.selected {
@@ -491,28 +451,4 @@
 		gap: 0.5rem;
 	}
 
-	h2 {
-		color: white;
-		margin-top: 0;
-	}
-
-	.controls {
-		display: flex;
-		gap: 1rem;
-		justify-content: center;
-		margin: 1rem;
-	}
-
-	.control-button {
-		background: #525252;
-		border: none;
-		color: white;
-		padding: 0.5rem 1rem;
-		border-radius: 4px;
-		cursor: pointer;
-	}
-
-	.control-button:hover {
-		background: #626262;
-	}
 </style>
