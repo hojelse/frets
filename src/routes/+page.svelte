@@ -60,6 +60,7 @@
 			"color": "#CC8F53"
 		}
 	}
+
 	let fret_count = 24;
 
 	let tuning_hex_to_array = (tuning: string) => {
@@ -236,24 +237,22 @@
 	<div class="guitar-container">
 		<div class="circle-container">
 			{#each grid as string}
-				<div class="string">
-					{#each string as id}
-						<label class="scale-checkbox">
-							<input
-								type="checkbox"
-								checked={key[id] === "1"}
-								on:change={() => toggleDegree(id)}
-								style:display="none"
-							/>
-							<div
-								style:background-color={!(key[id] === "1") ? "transparent" : scale_degrees[id].color}
-								class="circle"
-							>
-								{scale_degrees[id].short_name}
-							</div>
-						</label>
-					{/each}
-				</div>
+				{#each string as id}
+					<label class="scale-checkbox">
+						<input
+							type="checkbox"
+							checked={key[id] === "1"}
+							on:change={() => toggleDegree(id)}
+							style:display="none"
+						/>
+						<div
+							style:background-color={!(key[id] === "1") ? "transparent" : scale_degrees[id].color}
+							class="circle"
+						>
+							{scale_degrees[id].short_name}
+						</div>
+					</label>
+				{/each}
 			{/each}
 		</div>
 	</div>
@@ -348,17 +347,10 @@
 	.circle-container {
 		display: grid;
 		grid-template-rows: repeat(6, 25px);
-		gap: 10px;
-		justify-content: center;
-		padding: 1rem;
-	}
-
-	.string {
-		display: grid;
 		grid-template-columns: repeat(24, 25px);
 		gap: 10px;
 		justify-content: center;
-		user-select: none;
+		padding: 1rem;
 	}
 
 	.circle {
