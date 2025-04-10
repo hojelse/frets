@@ -1,9 +1,22 @@
 <script lang="ts">
-	import { onMount } from 'svelte';
+	import { goto } from '$app/navigation';
+	import { browser } from '$app/environment';
 
 	// Default values
-	let tuning = "073a50";
-	let key = "100010010000";
+	let tuning = new URLSearchParams(browser ? window.location.search : '').get('tuning') || "073a50";
+	$: tuning, updateURL()
+	
+	let key = new URLSearchParams(browser ? window.location.search : '').get('key') || "100010010000";
+	$: key, updateURL()
+
+	function updateURL() {
+		if (browser) {
+			const params = new URLSearchParams(window.location.search);
+			params.set('key', key);
+			params.set('tuning', tuning);
+			goto(`?${params}`);
+		}
+	}
 
 	interface ScaleDegree {
 		short_name: string;
