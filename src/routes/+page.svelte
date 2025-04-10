@@ -91,6 +91,10 @@
 		key = key; // trigger reactivity
 	}
 
+	function shiftTonic() {
+		key = key.slice(1) + key[0];
+	}
+
 	let key_to_name: { [key: string]: { name: string } } = {
 		"100010010000": { "name": "Major Triad" },
 		"100010010100": { "name": "6" },
@@ -202,6 +206,8 @@
 	</div>
 
 	<div class="chord-name">
+		<button class="modal-button" on:click={() => shiftTonic()}>Shift Tonic</button>
+		<button class="modal-button" on:click={() => showModal = true}>Change Key</button>
 		<div class="chord-name-text">
 			Key:
 			{#if key_to_name[key]}
@@ -210,7 +216,6 @@
 				Unknown
 			{/if}
 		</div>
-		<button class="modal-button" on:click={() => showModal = true}>Change Key</button>
 	</div>
 
 	{#if showModal}
