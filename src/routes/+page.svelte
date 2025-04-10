@@ -92,144 +92,75 @@
 	}
 
 	let key_to_name: { [key: string]: { name: string } } = {
-		"111111111111": {
-			"name": "Chromatic Scale"
-		},
-		"101010010100": { 
-			"name": "Major Pentatonic Scale"
-		},
-		"101011010101": { 
-			"name": "Major Scale"
-		},
-		"100101010010": { 
-			"name": "Minor Pentatonic Scale"
-		},
-		"101101011010": { 
-			"name": "(Natural) Minor Scale"
-		},
-		"101101010101": { 
-			"name": "Melodic Minor Scale"
-		},
-		"101101011001": { 
-			"name": "Harmonic Minor Scale"
-		},
-		"101010101010": { 
-			"name": "Whole-tone scale"
-		},
-		"100010010000": { 
-			"name": "Major Triad"
-		},
-		"100010010100": { 
-			"name": "6"
-		},
-		"100010010010": { 
-			"name": "7"
-		},
-		"101010010010": { 
-			"name": "9"
-		},
-		"101011010010": { 
-			"name": "11"
-		},
-		"101011010110": { 
-			"name": "13"
-		},
-		"100010010001": { 
-			"name": "maj7"
-		},
-		"101010010001": { 
-			"name": "maj9"
-		},
-		"100100010000": { 
-			"name": "m"
-		},
-		"100100010100": { 
-			"name": "m6"
-		},
-		"100100010010": { 
-			"name": "m7"
-		},
-		"101100010010": { 
-			"name": "m9"
-		},
-		"101101010010": { 
-			"name": "m11"
-		},
-		"101101010110": { 
-			"name": "m13"
-		},
-		"100100010001": { 
-			"name": "min/maj7"
-		},
-		"101100010001": { 
-			"name": "min/maj9"
-		},
-		"100100100000": { 
-			"name": "dim"
-		},
-		"100100100100": { 
-			"name": "dim7"
-		},
-		"100100100010": { 
-			"name": "half-dim"
-		},
-		"100010001000": { 
-			"name": "aug"
-		},
-		"100010001010": { 
-			"name": "aug7"
-		},
-		"101000010000": { 
-			"name": "sus2"
-		},
-		"100001010000": { 
-			"name": "sus4"
-		},
-		"100001010010": { 
-			"name": "7sus4"
-		},
-		"101001010000": { 
-			"name": "sus4 add9"
-		},
-		"101010010000": { 
-			"name": "add9"
-		},
-		"101100010000": { 
-			"name": "m add9"
-		},
-		"100010010110": { 
-			"name": "7add6"
-		},
-		"100000010000": { 
-			"name": "omit3"
-		},
-		"100000010010": { 
-			"name": "7omit3"
-		},
-		"100010000000": { 
-			"name": "omit5"
-		},
-		"100010100010": { 
-			"name": "7(b5)"
-		},
-		"110010010010": { 
-			"name": "7(b9)"
-		},
-		"100110010010": { 
-			"name": "7(#9)"
-		},
-		"101010110010": { 
-			"name": "7(#11)"
-		},
-		"110010011010": { 
-			"name": "7(b9b13)"
-		},
-		"100100011010": { 
-			"name": "m7(b13)"
-		},
-		"110110101010": { 
-			"name": "7alt"
-		},
+		"100010010000": { "name": "Major Triad" },
+		"100010010100": { "name": "6" },
+		"100010010010": { "name": "7" },
+		"101010010010": { "name": "9" },
+		"101011010010": { "name": "11" },
+		// "101011010110": { "name": "13" },
+		"100010010001": { "name": "maj7" },
+		"101010010001": { "name": "maj9" },
+		"100100010000": { "name": "m" },
+		"100100010100": { "name": "m6" },
+		"100100010010": { "name": "m7" },
+		"101100010010": { "name": "m9" },
+		"101101010010": { "name": "m11" },
+		// "101101010110": { "name": "m13" },
+		"100100010001": { "name": "min/maj7" },
+		"101100010001": { "name": "min/maj9" },
+		"100100100000": { "name": "dim" },
+		"100100100100": { "name": "dim7" },
+		"100100100010": { "name": "half-dim" },
+		"100010001000": { "name": "aug" },
+		"100010001010": { "name": "aug7" },
+		"101000010000": { "name": "sus2" },
+		"100001010000": { "name": "sus4" },
+		"100001010010": { "name": "7sus4" },
+		"101001010000": { "name": "sus4 add9" },
+		"101010010000": { "name": "add9" },
+		"101100010000": { "name": "m add9" },
+		"100010010110": { "name": "7add6" },
+		"100000010000": { "name": "omit3" },
+		"100000010010": { "name": "7omit3" },
+		"100010000000": { "name": "omit5" },
+		"100010100010": { "name": "7(b5)" },
+		"110010010010": { "name": "7(b9)" },
+		"100110010010": { "name": "7(#9)" },
+		"101010110010": { "name": "7(#11)" },
+		"110010011010": { "name": "7(b9b13)" },
+		"100100011010": { "name": "m7(b13)" },
+		"110110101010": { "name": "7alt" },
+
+		"111111111111": { "name": "Chromatic Scale" },
+		"101011010101": { "name": "Major Scale (Ionian Mode)" },
+		"101101010110": { "name": "Major Scale (Dorian Mode)" },
+		"110101011010": { "name": "Major Scale (Phrygian Mode)" },
+		"101010110101": { "name": "Major Scale (Lydian Mode)" },
+		"101011010110": { "name": "Major Scale (Mixolydian Mode)" },
+		"101101011010": { "name": "Minor Scale (Aeolian Mode)" },
+		"110101101010": { "name": "Major Scale (Locrian Mode)" },
+		"101010010100": { "name": "Major Pentatonic Scale" },
+		"100101010010": { "name": "Minor Pentatonic Scale" },
+		"101101010101": { "name": "Melodic Minor Scale" },
+		"101101011001": { "name": "Harmonic Minor Scale" },
+		"100101110010": { "name": "Minor Blues Scale (b5)" },
+		"100111010010": { "name": "Minor Blues Scale (3)" },
+		"100101010011": { "name": "Minor Blues Scale (7)" },
+		"100101110001": { "name": "Minor Blues Scale (b5, 7)" },
+		"100101110100": { "name": "Voodoo Blues Scale" },
+		"101110010100": { "name": "Major Blues Scale" },
+		"101111110110": { "name": "Mixolydian Blues Scale"},
+		"101011011101": { "name": "Major Bebop Scale" },
+		"101111010110": { "name": "Dorian Bebop Scale" },
+		"101011010111": { "name": "Dominant Bebop Scale" },
+		"110101111010": { "name": "Locrian Bebop Scale" },
+		"110011011011": { "name": "Phrygian Dominant Bebop Scale" },
+		"101101010111": { "name": "Dorian Melodic Bebop Scale" },
+		"101101011011": { "name": "Harmonic Minor Bebop Scale" },
+		"101101011101": { "name": "Melodic Minor Bebop Scale" },
+		"101101101101": { "name": "Whole Half Diminished Scale" },
+		"110110110110": { "name": "Half Whole Diminished Scale" },
+		"101010101010": { "name": "Whole-Tone Scale" },
 	}
 
 
