@@ -1,6 +1,7 @@
 <script lang="ts">
 	import { goto } from '$app/navigation';
 	import { browser } from '$app/environment';
+	import InfiniteCarousel from '$lib/InfiniteCarousel.svelte';
 
 	// Default values
 	let tuning = new URLSearchParams(browser ? window.location.search : '').get('tuning') || "073a50";
@@ -182,7 +183,7 @@
 </script>
 
 <div class="page">
-	<div class="guitar-container">
+	<InfiniteCarousel>
 		<div class="circle-container">
 			{#each grid as string}
 				{#each string as id}
@@ -203,7 +204,7 @@
 				{/each}
 			{/each}
 		</div>
-	</div>
+	</InfiniteCarousel>
 
 	<div class="chord-name">
 		<button class="modal-button" on:click={() => shiftTonic()}>Shift Tonic</button>
@@ -288,18 +289,14 @@
 		padding: 0;
 	}
 
-	.guitar-container {
-		display: flex;
-		flex-direction: row;
-	}
-
 	.circle-container {
 		display: grid;
 		grid-template-rows: repeat(6, 25px);
-		grid-template-columns: repeat(24, 25px);
+		grid-template-columns: repeat(24, 24fr);
 		gap: 10px;
 		justify-content: center;
 		padding: 1rem;
+		width: 100%;
 	}
 
 	.circle {
@@ -319,7 +316,6 @@
 		top: 0;
 		left: 0;
 		width: 100%;
-		height: 100%;
 		background: rgba(0, 0, 0, 0.5);
 		display: flex;
 		justify-content: center;
@@ -331,8 +327,6 @@
 		background: #424242;
 		padding: 2rem;
 		border-radius: 8px;
-		max-height: 80vh;
-		overflow-y: auto;
 		width: 80%;
 		max-width: 500px;
 	}
