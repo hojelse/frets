@@ -5,15 +5,21 @@
 
 	// Default values
 	let tuning = new URLSearchParams(browser ? window.location.search : '').get('tuning') || "073a50";
-	$: tuning, updateURL()
+	let tuningTimeout: ReturnType<typeof setTimeout>;
+	$: tuning, (() => {
+		clearTimeout(tuningTimeout);
+		tuningTimeout = setTimeout(() => updateURL(), 1000);
+	})();
 	
 	let key = new URLSearchParams(browser ? window.location.search : '').get('key') || "100010010000";
-	$: key, updateURL()
+	let keyRotation = parseInt(new URLSearchParams(browser ? window.location.search : '').get('rotation') || "0");
+	$: key, keyRotation, updateURL()
 
 	function updateURL() {
 		if (browser) {
 			const params = new URLSearchParams(window.location.search);
 			params.set('key', key);
+			params.set('rotation', keyRotation.toString());
 			params.set('tuning', tuning);
 			goto(`?${params}`);
 		}
@@ -77,6 +83,10 @@
 
 	let fret_count = 24;
 
+	let tonicNote: number | null = null;
+
+	const noteNames = ["C", "C#", "D", "D#", "E", "F", "F#", "G", "G#", "A", "A#", "B"];
+
 	let tuning_hex_to_array = (tuning: string) => {
 		return tuning.split('').map(char => parseInt(char, 16));
 	}
@@ -84,6 +94,40 @@
 	$: grid = tuning_hex_to_array(tuning).map(tuning => 
 		Array.from({length: fret_count}, (_, j) => (tuning + j) % 12)
 	);
+
+	function getDisplayName(noteIndex: number): string {
+		const displayIndex = (noteIndex - keyRotation + 12) % 12;
+		if (tonicNote === null) {
+			return scale_degrees[displayIndex]?.short_name || "?";
+		}
+		const relativeNote = (displayIndex + tonicNote) % 12;
+		return noteNames[relativeNote];
+	}
+
+	function getKeyAtIndex(index: number): string {
+		return key[index];
+	}
+
+	let pressHoldTimer: ReturnType<typeof setTimeout>;
+	let isPressingNote: number | null = null;
+
+	function handlePointerDown(id: number) {
+		isPressingNote = id;
+		pressHoldTimer = setTimeout(() => {
+			// Press-and-hold: set this note as the root (position 0)
+			keyRotation = id;
+			isPressingNote = null; // Mark that we handled it as a hold
+		}, 300);
+	}
+
+	function handlePointerUp(id: number) {
+		clearTimeout(pressHoldTimer);
+		if (isPressingNote === id) {
+			// This was a quick press (not held long enough)
+			toggleDegree(id);
+		}
+		isPressingNote = null;
+	}
 
 	function toggleDegree(index: number) {
 		const keyArray = key.split('');
@@ -93,7 +137,7 @@
 	}
 
 	function shiftTonic() {
-		key = key.slice(1) + key[0];
+		keyRotation = (keyRotation + 1) % 12;
 	}
 
 	let key_to_name: { [key: string]: { name: string } } = {
@@ -187,20 +231,18 @@
 		<div class="circle-container">
 			{#each grid as string}
 				{#each string as id}
-					<label class="scale-checkbox">
-						<input
-							type="checkbox"
-							checked={key[id] === "1"}
-							on:change={() => toggleDegree(id)}
-							style:display="none"
-						/>
-						<div
-							style:background-color={!(key[id] === "1") ? "transparent" : scale_degrees[id].color}
-							class="circle"
-						>
-							{scale_degrees[id].short_name}
-						</div>
-					</label>
+					<div
+						style:background-color={!(getKeyAtIndex(id) === "1") ? "transparent" : scale_degrees[(id - keyRotation + 12) % 12].color}
+						class="circle"
+						on:pointerdown={() => handlePointerDown(id)}
+						on:pointerup={() => handlePointerUp(id)}
+						on:pointerleave={() => {
+							clearTimeout(pressHoldTimer);
+							isPressingNote = null;
+						}}
+					>
+						{getDisplayName(id)}
+					</div>
 				{/each}
 			{/each}
 		</div>
@@ -216,6 +258,41 @@
 			{:else}
 				Unknown
 			{/if}
+		</div>
+	</div>
+
+	<div class="tuning-controls">
+		<label>
+			Tuning:
+			<input 
+				type="text" 
+				bind:value={tuning}
+				placeholder="e.g., 073a50"
+			/>
+		</label>
+		<button class="modal-button" on:click={() => addString()}>+String</button>
+		<button class="modal-button" on:click={() => removeString()}>-String</button>
+	</div>
+
+	<div class="tonic-controls">
+		<label>Root Note:</label>
+		<div class="note-buttons">
+			<button 
+				class="note-button" 
+				class:selected={tonicNote === null}
+				on:click={() => tonicNote = null}
+			>
+				Scale
+			</button>
+			{#each noteNames as note, index}
+				<button 
+					class="note-button" 
+					class:selected={tonicNote === index}
+					on:click={() => tonicNote = index}
+				>
+					{note}
+				</button>
+			{/each}
 		</div>
 	</div>
 
@@ -244,6 +321,7 @@
 								checked={key === degrees}
 								on:change={() => {
 									key = degrees;
+									keyRotation = 0;
 									showModal = false;
 								}}
 								style:display="none"
@@ -257,7 +335,7 @@
 												style:background-color={!(x === "1") ? "transparent" : scale_degrees[idx].color}
 												class="circle"
 										>
-											{scale_degrees[idx].short_name}
+											{getDisplayName(idx)}
 											</div>
 										{/if}
 									{/each}
@@ -309,6 +387,7 @@
 		font-weight: bold;
 		font-size: 0.8em;
 		user-select: none;
+		cursor: pointer;
 	}
 
 	.modal-backdrop {
@@ -355,6 +434,35 @@
 		margin-left: 1rem;
 	}
 
+	.tuning-controls {
+		display: flex;
+		flex-direction: row;
+		align-items: center;
+		gap: 0.5rem;
+		margin-top: 1rem;
+		color: white;
+	}
+
+	.tuning-controls label {
+		display: flex;
+		align-items: center;
+		gap: 0.5rem;
+	}
+
+	.tuning-controls input {
+		background: #525252;
+		border: 2px solid #525252;
+		color: white;
+		padding: 0.5rem;
+		border-radius: 4px;
+		font-family: monospace;
+		width: 120px;
+	}
+
+	.tuning-controls input::placeholder {
+		color: #999;
+	}
+
 	.chord-button {
 		padding: 0.5rem 1rem;
 		margin: 0.25rem;
@@ -384,6 +492,42 @@
 		display: flex;
 		flex-direction: column;
 		gap: 0.5rem;
+	}
+
+	.tonic-controls {
+		display: flex;
+		flex-direction: column;
+		align-items: flex-start;
+		gap: 0.5rem;
+		margin-top: 1rem;
+		color: white;
+	}
+
+	.tonic-controls label {
+		font-weight: bold;
+	}
+
+	.note-buttons {
+		display: flex;
+		flex-direction: row;
+		flex-wrap: wrap;
+		gap: 0.5rem;
+	}
+
+	.note-button {
+		background: #525252;
+		border: 2px solid #525252;
+		color: white;
+		padding: 0.5rem 0.75rem;
+		border-radius: 4px;
+		cursor: pointer;
+		font-size: 0.9em;
+		min-width: 50px;
+	}
+
+	.note-button.selected {
+		background: #727272;
+		border-color: #FE63FE;
 	}
 
 </style>
