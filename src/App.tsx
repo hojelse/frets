@@ -64,23 +64,21 @@ const minorRomanNumerals: Record<number, string> = {
 
 const commonTunings: Record<string, number[]> = {
   // Standard
-  "Standard (E)": [4, 9, 2, 7, 11, 4],           // E A D G B E
-  "Half Step Down (Eb)": [3, 8, 1, 6, 10, 3],    // D# G# C# F# A# D#
-  "Whole Step Down (D)": [2, 7, 0, 5, 9, 2],     // D G C F A D
+  "Standard (EADGBE)": [4, 9, 2, 7, 11, 4],
 
   // Drop Tunings
-  "Drop D": [2, 9, 2, 7, 11, 4],                  // D A D G B E
-  "Drop C": [0, 7, 0, 5, 9, 2],                   // C G C F A D
-  "Drop B": [11, 6, 11, 4, 8, 1],                 // B F# B E G# C#
+  "Drop D (DADGBE)": [2, 9, 2, 7, 11, 4],
+  "Drop C (CGCFAD)": [0, 7, 0, 5, 9, 2],
+  "Drop B (BF♯BEG♯C♯)": [11, 6, 11, 4, 8, 1],
 
   // Open Tunings
-  "Open G": [2, 7, 2, 7, 11, 2],                  // D G D G B D
-  "Open D": [2, 9, 2, 6, 9, 2],                   // D A D F# A D
-  "Open E": [4, 11, 4, 8, 11, 4],                 // E B E G# B E
-  "Open C": [0, 7, 0, 7, 0, 4],                   // C G C G C E
+  "Open G (DGDGBD)": [2, 7, 2, 7, 11, 2],
+  "Open D (DADF♯AD)": [2, 9, 2, 6, 9, 2],
+  "Open E (EBEg♯BE)": [4, 11, 4, 8, 11, 4],
+  "Open C (CGCGCE)": [0, 7, 0, 7, 0, 4],
 
   // Modal / Folk
-  "DADGAD": [2, 9, 2, 7, 9, 2],                   // D A D G A D
+  "DADGAD (DADGAD)": [2, 9, 2, 7, 9, 2],
 };
 
 const arraysEqual = (a: number[], b: number[]) => {
@@ -101,6 +99,7 @@ export function App() {
   )
   const [root, setRoot] = useState<number>(0)
   const [pressedNotes, setPressedNotes] = useState<Set<number>>(new Set())
+  const [fretCount, setFretCount] = useState(12)
   const holdTimerRef = useRef<number | null>(null)
   const holdTriggeredRef = useRef(false)
 
@@ -358,27 +357,24 @@ export function App() {
               </div>
             )
           })}
-          <div style={{ marginTop: "1rem", display: "flex", gap: "0.5rem", justifyContent: "center" }}>
             <button onClick={handleAddString}>Add String</button>
             <button onClick={handleRemoveString} disabled={tuning.length === 1}>Remove String</button>
-          </div>
+            <button onClick={() => setFretCount(fretCount + 1)}>More Frets</button>
+            <button onClick={() => setFretCount(Math.max(1, fretCount - 1))}>Fewer Frets</button>
         </div>
-        <div className="container">
+        <div className="container" style={{
+          gap: "3px" 
+        }}>
           {tuning.toReversed().map((c, i) => {
             return (
-              <div
-                style={{
-                  display: "flex",
-                }}
-              >
                 <div
                   style={{
                     display: "flex",
-                    gap: "10px",
+                    gap: "30px",
                   }}
                 >
-                  {Object.keys(functions).map((d, i) => {
-                    const raw = mod12(Number(c) + Number(d))
+                  {Array.from({ length: fretCount }, (_, i) => {
+                    const raw = mod12(Number(c) + i)
                     const isSelected = selection[raw] === 1
                     const color = colorMap[mod12(raw - root)]
                     const isRoot = raw === root
@@ -395,8 +391,9 @@ export function App() {
                         onPointerLeave={handleNotePressCancel}
                         style={{
                           backgroundColor: isSelected ? color : undefined,
-                          width: "45px",
-                          height: "45px",
+                          width: "40px",
+                          height: "40px",
+                          borderRadius: "100vw",
                           border: isRoot ? `2px solid ${colorMap[0]}` : undefined,
                           fontWeight: isRoot ? 'bold' : undefined,
                           opacity: isPressed ? 0.7 : 1,
@@ -409,7 +406,6 @@ export function App() {
                     )
                   })}
                 </div>
-              </div>
             )
           })}
         </div>
