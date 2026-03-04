@@ -339,7 +339,6 @@ export function App() {
 					width: "100vw",
 					boxSizing: "border-box",
 					display: "grid",
-					overflowX: "scroll",
 					placeContent: "center",
         }}>
           <div
