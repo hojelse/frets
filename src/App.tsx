@@ -127,12 +127,12 @@ export function App() {
     setSelection(rotateArray(selection, d))
   }
 
-  const handleShiftTuning = (d) => {
+  const handleShiftTuning = (d: number) => {
     const updated = tuning.map((value) => shift(value, d))
     setTuning(updated)
   }
 
-  const handleShift = (i, d) => {
+  const handleShift = (i: number, d: number) => {
     const updated = [...tuning]
     updated[i] = shift(updated[i], d)
     setTuning(updated)
@@ -231,7 +231,7 @@ export function App() {
   }
 
   const handleChangeDisplayMode = (value: string) => {
-    setDisplayMode(value)
+    setDisplayMode(value as "raw" | "notes" | "functions")
   }
 
   const rotations = Array.from({ length: 12 }, (_, i) => {
