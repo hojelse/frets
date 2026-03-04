@@ -61,6 +61,11 @@ select {
   background: #fff;
 }
 
+text {
+  user-select: none;
+  -webkit-user-select: none;
+}
+
 .note-selected {
   background: #dbeafe;
 }

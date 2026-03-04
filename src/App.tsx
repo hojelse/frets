@@ -427,22 +427,22 @@ export function App() {
 						display: "flex",
 						flexDirection: "column"
 					}}>
-          <button onClick={() => handleShiftTuning(-1)}>Transpose down</button>
-					<select 
-            name="tunings" 
-            value={getCurrentTuningName()}
-            onChange={(event) => handleChangeTuning(event.target.value)}
-          >
-            <option value="">Custom Tuning</option>
-            {Object.keys(commonTunings).map((name) => (
-              <option key={name} value={name}>
-                {name}
-              </option>
-            ))}
-          </select>
-          <button onClick={() => handleShiftTuning(+1)}>Transpose up</button>
+						<button onClick={() => handleShiftTuning(-1)}>Transpose down</button>
+						<select 
+							name="tunings" 
+							value={getCurrentTuningName()}
+							onChange={(event) => handleChangeTuning(event.target.value)}
+						>
+							<option value="">Custom Tuning</option>
+							{Object.keys(commonTunings).map((name) => (
+								<option key={name} value={name}>
+									{name}
+								</option>
+							))}
+						</select>
+						<button onClick={() => handleShiftTuning(+1)}>Transpose up</button>
 					</div>
-          {tuning.toReversed().map((c, i) => {
+          {tuning.map((c, i) => {
             const stringIndex = tuning.length - 1 - i
             return (
               <div
