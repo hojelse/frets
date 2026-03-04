@@ -357,10 +357,69 @@ export function App() {
               </div>
             )
           })}
-            <button onClick={handleAddString}>Add String</button>
-            <button onClick={handleRemoveString} disabled={tuning.length === 1}>Remove String</button>
-            <button onClick={() => setFretCount(fretCount + 1)}>More Frets</button>
-            <button onClick={() => setFretCount(Math.max(1, fretCount - 1))}>Fewer Frets</button>
+            <div style={{ display: "flex", gap: "0.5rem", alignItems: "center" }}>
+              <button onClick={handleRemoveString} disabled={tuning.length === 1}>
+                -
+              </button>
+              <input
+                type="number"
+                min="1"
+                value={tuning.length}
+                onChange={(e) => {
+                  const newLength = parseInt(e.target.value)
+                  if (newLength > 0) {
+                    const current = tuning.length
+                    if (newLength > current) {
+                      for (let i = current; i < newLength; i++) {
+                        handleAddString()
+                      }
+                    } else if (newLength < current) {
+                      for (let i = current; i > newLength; i--) {
+                        handleRemoveString()
+                      }
+                    }
+                  }
+                }}
+                style={{
+                  width: "50px",
+                  textAlign: "center",
+                  padding: "0.4rem",
+                  border: "1px solid #ddd",
+                  borderRadius: "4px",
+                  fontFamily: "'Noto Serif', serif",
+                  color: "#000",
+                  backgroundColor: "#fff",
+                }}
+              />
+              <button onClick={handleAddString}>+</button>
+            </div>
+            <div style={{ display: "flex", gap: "0.5rem", alignItems: "center" }}>
+              <button onClick={() => setFretCount(Math.max(1, fretCount - 1))}>
+                -
+              </button>
+              <input
+                type="number"
+                min="1"
+                value={fretCount}
+                onChange={(e) => {
+                  const newFretCount = parseInt(e.target.value)
+                  if (newFretCount > 0) {
+                    setFretCount(newFretCount)
+                  }
+                }}
+                style={{
+                  width: "50px",
+                  textAlign: "center",
+                  padding: "0.4rem",
+                  border: "1px solid #ddd",
+                  borderRadius: "4px",
+                  fontFamily: "'Noto Serif', serif",
+                  color: "#000",
+                  backgroundColor: "#fff",
+                }}
+              />
+              <button onClick={() => setFretCount(fretCount + 1)}>+</button>
+            </div>
         </div>
         <div className="container" style={{
           gap: "3px" 
