@@ -90,6 +90,7 @@ const arraysEqual = (a: number[], b: number[]) => {
 const circleOfFifths = [0, 7, 2, 9, 4, 11, 6, 1, 8, 3, 10, 5]
 
 export function App() {
+  const UNKNOWN_VALUE = "unknown"
   const HOLD_MS = 350
   const [tuning, setTuning] = useState([4, 9, 2, 7, 11, 4])
   const [selection, setSelection] = useState<number[]>([
@@ -234,6 +235,30 @@ export function App() {
     setDisplayMode(value as "raw" | "notes" | "functions")
   }
 
+  const handleSelectChord = (name: string) => {
+    if (!name || name === UNKNOWN_VALUE) return
+
+    const entry = Object.entries(selectionToChordNames).find(([, names]) =>
+      names.includes(name),
+    )
+    if (!entry) return
+
+    const selectedPattern = entry[0].split("").map((digit) => Number(digit))
+    setSelection(rotateArray(selectedPattern, -root))
+  }
+
+  const handleSelectScale = (name: string) => {
+    if (!name || name === UNKNOWN_VALUE) return
+
+    const entry = Object.entries(selectionToScaleNames).find(([, names]) =>
+      names.includes(name),
+    )
+    if (!entry) return
+
+    const selectedPattern = entry[0].split("").map((digit) => Number(digit))
+    setSelection(rotateArray(selectedPattern, -root))
+  }
+
   const rotations = Array.from({ length: 12 }, (_, i) => {
     const pattern = rotateArray(selection, root + i).join("")
     const chords = selectionToChordNames[pattern] ?? []
@@ -256,6 +281,19 @@ export function App() {
     (rotation) => rotation.scales.length > 0,
   )
   const shiftedTunings = getShiftedTuningMatches()
+  const allChordNames = Array.from(
+    new Set(Object.values(selectionToChordNames).flat()),
+  )
+  const allScaleNames = Array.from(
+    new Set(Object.values(selectionToScaleNames).flat()),
+  )
+  const currentTuningName = getCurrentTuningName()
+  const tuningSelectValue = commonTunings[currentTuningName]
+    ? currentTuningName
+    : UNKNOWN_VALUE
+  const currentPattern = rotateArray(selection, root).join("")
+  const chordSelectValue = selectionToChordNames[currentPattern]?.[0] ?? UNKNOWN_VALUE
+  const scaleSelectValue = selectionToScaleNames[currentPattern]?.[0] ?? UNKNOWN_VALUE
 
   return (
     <main>
@@ -514,23 +552,52 @@ export function App() {
 
         <div style={{ display: "flex", gap: "25px"}}>
           <div className="names">
-            {shiftedTunings.length > 0 && <h3>Tunings:</h3>}
+            <h3>Tunings:</h3>
+            <select
+              name="tunings-list"
+              value={tuningSelectValue}
+              onChange={(event) => handleChangeTuning(event.target.value)}
+            >
+              <option value={UNKNOWN_VALUE}>Unknown</option>
+              {Object.keys(commonTunings).map((name) => (
+                <option key={name} value={name}>
+                  {name}
+                </option>
+              ))}
+            </select>
             {shiftedTunings.map((match, i) => (
               <div key={i}>
                 {match.shift > 0 && <span>rotation +{match.shift}: </span>}
-                <button>
+                <button
+                  onClick={() => {
+                    setTuning(commonTunings[match.name].map((note) => mod12(note)))
+                  }
+                  }
+                >
                   {match.name}
                 </button>
               </div>
             ))}
           </div>
           <div className="names">
-            {chordRotations.length > 0 && <h3>Chords:</h3>}
+            <h3>Chords:</h3>
+            <select
+              name="chords-list"
+              value={chordSelectValue}
+              onChange={(event) => handleSelectChord(event.target.value)}
+            >
+              <option value={UNKNOWN_VALUE}>Unknown</option>
+              {allChordNames.map((name) => (
+                <option key={name} value={name}>
+                  {name}
+                </option>
+              ))}
+            </select>
             {chordRotations.map((rotation) => (
               <div key={rotation.i}>
                 {rotation.i > 0 && <span>rotation +{rotation.i}: </span>}
                 {rotation.chords.map((name, j) => (
-                  <button key={j}>
+                  <button key={j} onClick={() => setRoot(mod12(root + rotation.i))}>
                     {rotation.prefix}
                     {name}
                   </button>
@@ -539,12 +606,24 @@ export function App() {
             ))}
           </div>
           <div className="names">
-            {scaleRotations.length > 0 && <h3>Scales:</h3>}
+            <h3>Scales:</h3>
+            <select
+              name="scales-list"
+              value={scaleSelectValue}
+              onChange={(event) => handleSelectScale(event.target.value)}
+            >
+              <option value={UNKNOWN_VALUE}>Unknown</option>
+              {allScaleNames.map((name) => (
+                <option key={name} value={name}>
+                  {name}
+                </option>
+              ))}
+            </select>
             {scaleRotations.map((rotation) => (
               <div key={rotation.i}>
                 {rotation.i > 0 && <span>rotation +{rotation.i}: </span>}
                 {rotation.scales.map((name, j) => (
-                  <button key={j}>{name}</button>
+                  <button key={j} onClick={() => setRoot(mod12(root + rotation.i))}>{name}</button>
                 ))}
               </div>
             ))}
