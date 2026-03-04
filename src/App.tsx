@@ -102,6 +102,7 @@ export function App() {
   const [fretCount, setFretCount] = useState(15)
   const holdTimerRef = useRef<number | null>(null)
   const holdTriggeredRef = useRef(false)
+  const touchStartXRef = useRef<number | null>(null)
 
   const displayValue = (c: number) => {
     if (displayMode === "raw") return c
@@ -234,6 +235,28 @@ export function App() {
     setDisplayMode(value as "raw" | "notes" | "functions")
   }
 
+  const handleTouchStart = (e: React.TouchEvent) => {
+    touchStartXRef.current = e.touches[0].clientX
+  }
+
+  const handleTouchEnd = (e: React.TouchEvent) => {
+    if (touchStartXRef.current === null) return
+    const touchEndX = e.changedTouches[0].clientX
+    const distance = touchStartXRef.current - touchEndX
+    const threshold = 50
+
+    if (Math.abs(distance) > threshold) {
+      if (distance > 0) {
+        // Swiped left, transpose up
+        handleShiftTuning(1)
+      } else {
+        // Swiped right, transpose down
+        handleShiftTuning(-1)
+      }
+    }
+    touchStartXRef.current = null
+  }
+
   const handleSelectChord = (name: string) => {
     if (!name || name === UNKNOWN_VALUE) return
 
@@ -295,7 +318,8 @@ export function App() {
   const scaleSelectValue = selectionToScaleNames[currentPattern]?.[0] ?? UNKNOWN_VALUE
 
   return (
-    <main>
+    <main
+    >
       <div
 				className="containers"
         style={{
@@ -421,7 +445,10 @@ export function App() {
               <button onClick={() => setFretCount(fretCount + 1)}>+</button>
             </div>
         </div>
-        <div className="container" style={{
+        <div className="container" 
+      onTouchStart={handleTouchStart}
+      onTouchEnd={handleTouchEnd}
+        style={{
           gap: "3px" 
         }}>
           <div
