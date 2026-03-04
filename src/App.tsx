@@ -324,132 +324,23 @@ export function App() {
 				className="containers"
         style={{
           display: "flex",
+					flexDirection: "column",
 					alignItems: "center",
 					gap: "25px",
 					paddingTop: "100px"
         }}
       >
-        <div className="container">
-          <button onClick={() => handleShiftTuning(-1)}>Transpose down</button>
-					<select 
-            name="tunings" 
-            value={getCurrentTuningName()}
-            onChange={(event) => handleChangeTuning(event.target.value)}
-          >
-            <option value="">Custom Tuning</option>
-            {Object.keys(commonTunings).map((name) => (
-              <option key={name} value={name}>
-                {name}
-              </option>
-            ))}
-          </select>
-          <button onClick={() => handleShiftTuning(+1)}>Transpose up</button>
-          {tuning.toReversed().map((c, i) => {
-            const stringIndex = tuning.length - 1 - i
-            return (
-              <div
-                style={{
-                  display: "flex",
-                }}
-              >
-                <div
-                  key={i}
-                  style={{
-                    display: "flex",
-                  }}
-                >
-                  <button onClick={() => handleShift(stringIndex, -1)}>
-                    -
-                  </button>
-                  <select
-                    className="stringTuning"
-                    value={c}
-                    onChange={(event) =>
-                      handleSetStringTuning(stringIndex, Number(event.target.value))
-                    }
-                  >
-                    {Array.from({ length: 12 }, (_, value) => (
-                      <option key={value} value={value}>
-                        {displayValue(value)}
-                      </option>
-                    ))}
-                  </select>
-                  <button onClick={() => handleShift(stringIndex, 1)}>
-                    +
-                  </button>
-                </div>
-              </div>
-            )
-          })}
-            <div style={{ display: "flex", gap: "0.5rem", alignItems: "center" }}>
-              <button onClick={handleRemoveString} disabled={tuning.length === 1}>
-                -
-              </button>
-              <input
-                type="number"
-                min="1"
-                value={tuning.length}
-                onChange={(e) => {
-                  const newLength = parseInt(e.target.value)
-                  if (newLength > 0) {
-                    const current = tuning.length
-                    if (newLength > current) {
-                      for (let i = current; i < newLength; i++) {
-                        handleAddString()
-                      }
-                    } else if (newLength < current) {
-                      for (let i = current; i > newLength; i--) {
-                        handleRemoveString()
-                      }
-                    }
-                  }
-                }}
-                style={{
-                  width: "50px",
-                  textAlign: "center",
-                  padding: "0.4rem",
-                  border: "1px solid #ddd",
-                  borderRadius: "4px",
-                  fontFamily: "'Noto Serif', serif",
-                  color: "#000",
-                  backgroundColor: "#fff",
-                }}
-              />
-              <button onClick={handleAddString}>+</button>
-            </div>
-            <div style={{ display: "flex", gap: "0.5rem", alignItems: "center" }}>
-              <button onClick={() => setFretCount(Math.max(0, fretCount - 1))}>
-                -
-              </button>
-              <input
-                type="number"
-                min="0"
-                value={fretCount}
-                onChange={(e) => {
-                  const newFretCount = parseInt(e.target.value)
-                  if (newFretCount >= 0) {
-                    setFretCount(newFretCount)
-                  }
-                }}
-                style={{
-                  width: "50px",
-                  textAlign: "center",
-                  padding: "0.4rem",
-                  border: "1px solid #ddd",
-                  borderRadius: "4px",
-                  fontFamily: "'Noto Serif', serif",
-                  color: "#000",
-                  backgroundColor: "#fff",
-                }}
-              />
-              <button onClick={() => setFretCount(fretCount + 1)}>+</button>
-            </div>
-        </div>
-        <div className="container" 
+
+        <div 
       onTouchStart={handleTouchStart}
       onTouchEnd={handleTouchEnd}
         style={{
-          gap: "3px" 
+          gap: "3px",
+					width: "100vw",
+					boxSizing: "border-box",
+					display: "grid",
+					overflowX: "scroll",
+					placeContent: "center",
         }}>
           <div
             style={{
@@ -526,6 +417,139 @@ export function App() {
                 </div>
             )
           })}
+        </div>
+        <div className="container"
+				style={{
+					display: "flex",
+					flexDirection: "row"
+				}}
+				>
+					<div style={{
+						display: "flex",
+						flexDirection: "column"
+					}}>
+          <button onClick={() => handleShiftTuning(-1)}>Transpose down</button>
+					<select 
+            name="tunings" 
+            value={getCurrentTuningName()}
+            onChange={(event) => handleChangeTuning(event.target.value)}
+          >
+            <option value="">Custom Tuning</option>
+            {Object.keys(commonTunings).map((name) => (
+              <option key={name} value={name}>
+                {name}
+              </option>
+            ))}
+          </select>
+          <button onClick={() => handleShiftTuning(+1)}>Transpose up</button>
+					</div>
+          {tuning.toReversed().map((c, i) => {
+            const stringIndex = tuning.length - 1 - i
+            return (
+              <div
+                style={{
+                  display: "flex",
+                }}
+              >
+                <div
+                  key={i}
+                  style={{
+                    display: "flex",
+										flexDirection: "column"
+                  }}
+                >
+                  <button onClick={() => handleShift(stringIndex, -1)}>
+                    -
+                  </button>
+                  <select
+                    className="stringTuning"
+                    value={c}
+                    onChange={(event) =>
+                      handleSetStringTuning(stringIndex, Number(event.target.value))
+                    }
+                  >
+                    {Array.from({ length: 12 }, (_, value) => (
+                      <option key={value} value={value}>
+                        {displayValue(value)}
+                      </option>
+                    ))}
+                  </select>
+                  <button onClick={() => handleShift(stringIndex, 1)}>
+                    +
+                  </button>
+                </div>
+              </div>
+            )
+          })}
+            <div style={{
+						display: "flex",
+						flexDirection: "column"
+					}}>
+              <button onClick={handleRemoveString} disabled={tuning.length === 1}>
+                -
+              </button>
+              <input
+                type="number"
+                min="1"
+                value={tuning.length}
+                onChange={(e) => {
+                  const newLength = parseInt(e.target.value)
+                  if (newLength > 0) {
+                    const current = tuning.length
+                    if (newLength > current) {
+                      for (let i = current; i < newLength; i++) {
+                        handleAddString()
+                      }
+                    } else if (newLength < current) {
+                      for (let i = current; i > newLength; i--) {
+                        handleRemoveString()
+                      }
+                    }
+                  }
+                }}
+                style={{
+                  width: "50px",
+                  textAlign: "center",
+                  padding: "0.4rem",
+                  border: "1px solid #ddd",
+                  borderRadius: "4px",
+                  fontFamily: "'Noto Serif', serif",
+                  color: "#000",
+                  backgroundColor: "#fff",
+                }}
+              />
+              <button onClick={handleAddString}>+</button>
+            </div>
+            <div style={{
+						display: "flex",
+						flexDirection: "column"
+					}}>
+              <button onClick={() => setFretCount(Math.max(0, fretCount - 1))}>
+                -
+              </button>
+              <input
+                type="number"
+                min="0"
+                value={fretCount}
+                onChange={(e) => {
+                  const newFretCount = parseInt(e.target.value)
+                  if (newFretCount >= 0) {
+                    setFretCount(newFretCount)
+                  }
+                }}
+                style={{
+                  width: "50px",
+                  textAlign: "center",
+                  padding: "0.4rem",
+                  border: "1px solid #ddd",
+                  borderRadius: "4px",
+                  fontFamily: "'Noto Serif', serif",
+                  color: "#000",
+                  backgroundColor: "#fff",
+                }}
+              />
+              <button onClick={() => setFretCount(fretCount + 1)}>+</button>
+            </div>
         </div>
           <div
             style={{
