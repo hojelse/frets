@@ -99,7 +99,7 @@ export function App() {
   )
   const [root, setRoot] = useState<number>(0)
   const [pressedNotes, setPressedNotes] = useState<Set<number>>(new Set())
-  const [fretCount, setFretCount] = useState(12)
+  const [fretCount, setFretCount] = useState(15)
   const holdTimerRef = useRef<number | null>(null)
   const holdTriggeredRef = useRef(false)
 
@@ -394,16 +394,16 @@ export function App() {
               <button onClick={handleAddString}>+</button>
             </div>
             <div style={{ display: "flex", gap: "0.5rem", alignItems: "center" }}>
-              <button onClick={() => setFretCount(Math.max(1, fretCount - 1))}>
+              <button onClick={() => setFretCount(Math.max(0, fretCount - 1))}>
                 -
               </button>
               <input
                 type="number"
-                min="1"
+                min="0"
                 value={fretCount}
                 onChange={(e) => {
                   const newFretCount = parseInt(e.target.value)
-                  if (newFretCount > 0) {
+                  if (newFretCount >= 0) {
                     setFretCount(newFretCount)
                   }
                 }}
@@ -424,6 +424,38 @@ export function App() {
         <div className="container" style={{
           gap: "3px" 
         }}>
+          <div
+            style={{
+              display: "flex",
+              gap: "30px",
+              marginBottom: "0.5rem",
+              justifyContent: "center",
+              alignItems: "center",
+              height: "20px",
+              fontSize: "12px",
+              fontWeight: "bold",
+              color: "#666",
+            }}
+          >
+            {Array.from({ length: fretCount + 1 }, (_, i) => {
+              const markedFrets = [0, 3, 5, 7, 9, 12, 15, 17, 19, 21]
+              const showLabel = markedFrets.includes(i)
+              return (
+                <div
+                  key={i}
+                  style={{
+                    width: "40px",
+                    height: "20px",
+                    display: "flex",
+                    alignItems: "center",
+                    justifyContent: "center",
+                  }}
+                >
+                  {showLabel && i}
+                </div>
+              )
+            })}
+          </div>
           {tuning.toReversed().map((c, i) => {
             return (
                 <div
@@ -432,7 +464,7 @@ export function App() {
                     gap: "30px",
                   }}
                 >
-                  {Array.from({ length: fretCount }, (_, i) => {
+                  {Array.from({ length: fretCount + 1 }, (_, i) => {
                     const raw = mod12(Number(c) + i)
                     const isSelected = selection[raw] === 1
                     const color = colorMap[mod12(raw - root)]
