@@ -521,7 +521,7 @@ export function App() {
           <div
             style={{
               display: "flex",
-              gap: "30px",
+              gap: "20px",
               marginBottom: "0.5rem",
               justifyContent: "center",
               alignItems: "center",
@@ -538,7 +538,7 @@ export function App() {
                 <div
                   key={i}
                   style={{
-                    width: "40px",
+                    width: "35px",
                     height: "20px",
                     display: "flex",
                     alignItems: "center",
@@ -555,7 +555,7 @@ export function App() {
                 <div
                   style={{
                     display: "flex",
-                    gap: "30px",
+                    gap: "20px",
                   }}
                 >
                   {Array.from({ length: fretCount + 1 }, (_, i) => {
@@ -576,8 +576,9 @@ export function App() {
                         onPointerLeave={handleNotePressCancel}
                         style={{
                           backgroundColor: isSelected ? color : undefined,
-                          width: "40px",
-                          height: "40px",
+                          width: "35px",
+                          height: "35px",
+													fontSize: "0.6em",
                           borderRadius: "100vw",
                           border: isRoot ? `2px solid ${colorMap[0]}` : undefined,
                           fontWeight: isRoot ? 'bold' : undefined,
