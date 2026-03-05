@@ -425,6 +425,46 @@ export function App() {
 					flexDirection: "row"
 				}}
 				>
+        <div
+          style={{
+            display: "flex",
+            flexDirection: "column",
+            alignItems: "center",
+            gap: "2rem",
+          }}
+        >
+          <div
+            style={{
+              display: "flex",
+            }}
+          >
+            <select
+              className="changeRoot"
+              value={root}
+              onChange={(event) => {
+                const newRoot = Number(event.target.value)
+                setRoot(newRoot)
+              }}
+            >
+              {Array.from({ length: 12 }, (_, i) => (
+                <option key={i} value={i}>
+                  {i}
+                </option>
+              ))}
+            </select>
+            <select
+              value={displayMode}
+              onChange={(event) => handleChangeDisplayMode(event.target.value)}
+            >
+              {["raw", "functions", "notes"].map((i) => (
+                <option key={i} value={i}>
+                  {i}
+                </option>
+              ))}
+            </select>
+          </div>
+        </div>
+
 					<div style={{
 						display: "flex",
 						flexDirection: "column"
@@ -551,7 +591,7 @@ export function App() {
               />
               <button onClick={() => setFretCount(fretCount + 1)}>+</button>
             </div>
-        </div>
+				</div>
           <div
             style={{
               width: "300px",
@@ -649,45 +689,6 @@ export function App() {
           </div>
       </div>
       <div className="moreStuff">
-        <div
-          style={{
-            display: "flex",
-            flexDirection: "column",
-            alignItems: "center",
-            gap: "2rem",
-          }}
-        >
-          <div
-            style={{
-              display: "flex",
-            }}
-          >
-            <select
-              className="changeRoot"
-              value={root}
-              onChange={(event) => {
-                const newRoot = Number(event.target.value)
-                setRoot(newRoot)
-              }}
-            >
-              {Array.from({ length: 12 }, (_, i) => (
-                <option key={i} value={i}>
-                  {i}
-                </option>
-              ))}
-            </select>
-            <select
-              value={displayMode}
-              onChange={(event) => handleChangeDisplayMode(event.target.value)}
-            >
-              {["raw", "functions", "notes"].map((i) => (
-                <option key={i} value={i}>
-                  {i}
-                </option>
-              ))}
-            </select>
-          </div>
-        </div>
 
         <div style={{ display: "flex", gap: "25px"}}>
           <div className="names">
