@@ -322,6 +322,7 @@ export function App() {
   return (
     <main
     >
+
       <div
 				className="containers"
         style={{
@@ -329,96 +330,10 @@ export function App() {
 					flexDirection: "column",
 					alignItems: "center",
 					gap: "25px",
-					paddingTop: "100px"
+					paddingTop: "100px",
+					maxWidth: "1080px"
         }}
       >
-
-        <div 
-      onTouchStart={handleTouchStart}
-      onTouchEnd={handleTouchEnd}
-        style={{
-          gap: "3px",
-					width: "100vw",
-					boxSizing: "border-box",
-					display: "grid",
-					placeContent: "center",
-        }}>
-          <div
-            style={{
-              display: "flex",
-              gap: "30px",
-              marginBottom: "0.5rem",
-              justifyContent: "center",
-              alignItems: "center",
-              height: "20px",
-              fontSize: "12px",
-              fontWeight: "bold",
-              color: "#666",
-            }}
-          >
-            {Array.from({ length: fretCount + 1 }, (_, i) => {
-              const markedFrets = [0, 3, 5, 7, 9, 12, 15, 17, 19, 21]
-              const showLabel = markedFrets.includes(i)
-              return (
-                <div
-                  key={i}
-                  style={{
-                    width: "40px",
-                    height: "20px",
-                    display: "flex",
-                    alignItems: "center",
-                    justifyContent: "center",
-                  }}
-                >
-                  {showLabel && i}
-                </div>
-              )
-            })}
-          </div>
-          {tuning.toReversed().map((c, i) => {
-            return (
-                <div
-                  style={{
-                    display: "flex",
-                    gap: "30px",
-                  }}
-                >
-                  {Array.from({ length: fretCount + 1 }, (_, i) => {
-                    const raw = mod12(Number(c) + i)
-                    const isSelected = selection[raw] === 1
-                    const color = colorMap[mod12(raw - root)]
-                    const isRoot = raw === root
-
-                    const isPressed = pressedNotes.has(raw)
-
-                    return (
-                      <button
-                        key={i}
-                        className="note"
-                        onPointerDown={() => handleNotePressStart(raw)}
-                        onPointerUp={() => handleNotePressEnd(raw)}
-                        onPointerCancel={handleNotePressCancel}
-                        onPointerLeave={handleNotePressCancel}
-                        style={{
-                          backgroundColor: isSelected ? color : undefined,
-                          width: "40px",
-                          height: "40px",
-                          borderRadius: "100vw",
-                          border: isRoot ? `2px solid ${colorMap[0]}` : undefined,
-                          fontWeight: isRoot ? 'bold' : undefined,
-                          opacity: isPressed ? 0.7 : 1,
-                          transform: isPressed ? 'scale(0.95)' : 'scale(1)',
-                          transition: 'transform 0.05s, opacity 0.05s',
-                        }}
-                      >
-                        {displayValue(raw)}
-                      </button>
-                    )
-                  })}
-                </div>
-            )
-          })}
-        </div>
         <div className="container"
 				style={{
 					display: "flex",
@@ -592,6 +507,93 @@ export function App() {
               <button onClick={() => setFretCount(fretCount + 1)}>+</button>
             </div>
 				</div>
+
+        <div 
+      onTouchStart={handleTouchStart}
+      onTouchEnd={handleTouchEnd}
+        style={{
+          gap: "3px",
+					width: "100vw",
+					boxSizing: "border-box",
+					display: "grid",
+					placeContent: "center",
+        }}>
+          <div
+            style={{
+              display: "flex",
+              gap: "30px",
+              marginBottom: "0.5rem",
+              justifyContent: "center",
+              alignItems: "center",
+              height: "20px",
+              fontSize: "12px",
+              fontWeight: "bold",
+              color: "#666",
+            }}
+          >
+            {Array.from({ length: fretCount + 1 }, (_, i) => {
+              const markedFrets = [0, 3, 5, 7, 9, 12, 15, 17, 19, 21]
+              const showLabel = markedFrets.includes(i)
+              return (
+                <div
+                  key={i}
+                  style={{
+                    width: "40px",
+                    height: "20px",
+                    display: "flex",
+                    alignItems: "center",
+                    justifyContent: "center",
+                  }}
+                >
+                  {showLabel && i}
+                </div>
+              )
+            })}
+          </div>
+          {tuning.toReversed().map((c, i) => {
+            return (
+                <div
+                  style={{
+                    display: "flex",
+                    gap: "30px",
+                  }}
+                >
+                  {Array.from({ length: fretCount + 1 }, (_, i) => {
+                    const raw = mod12(Number(c) + i)
+                    const isSelected = selection[raw] === 1
+                    const color = colorMap[mod12(raw - root)]
+                    const isRoot = raw === root
+
+                    const isPressed = pressedNotes.has(raw)
+
+                    return (
+                      <button
+                        key={i}
+                        className="note"
+                        onPointerDown={() => handleNotePressStart(raw)}
+                        onPointerUp={() => handleNotePressEnd(raw)}
+                        onPointerCancel={handleNotePressCancel}
+                        onPointerLeave={handleNotePressCancel}
+                        style={{
+                          backgroundColor: isSelected ? color : undefined,
+                          width: "40px",
+                          height: "40px",
+                          borderRadius: "100vw",
+                          border: isRoot ? `2px solid ${colorMap[0]}` : undefined,
+                          fontWeight: isRoot ? 'bold' : undefined,
+                          opacity: isPressed ? 0.7 : 1,
+                          transform: isPressed ? 'scale(0.95)' : 'scale(1)',
+                          transition: 'transform 0.05s, opacity 0.05s',
+                        }}
+                      >
+                        {displayValue(raw)}
+                      </button>
+                    )
+                  })}
+                </div>
+            )
+          })}
+        </div>
           <div
             style={{
               width: "300px",
