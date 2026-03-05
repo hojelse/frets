@@ -92,7 +92,7 @@ export function App() {
   const HOLD_MS = 350
   const [tuning, setTuning] = useState([4, 9, 2, 7, 11, 4])
   const [selection, setSelection] = useState<number[]>([
-    1, 0, 0, 0, 1, 0, 0, 1, 0, 0, 0, 0,
+    1, 0, 0, 0, 1, 0, 0, 1, 0, 0, 0, 1,
   ])
   const [displayMode, setDisplayMode] = useState<"raw" | "notes" | "functions">(
     "functions",
