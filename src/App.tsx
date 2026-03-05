@@ -282,15 +282,17 @@ export function App() {
   }
 
   const rotations = Array.from({ length: 12 }, (_, i) => {
-    const pattern = rotateArray(selection, root + i).join("")
+		const relativeSelection = rotateArray(selection, -root)
+    const pattern = rotateArray(relativeSelection, i).join("")
     const chords = selectionToChordNames[pattern] ?? []
     const scales = selectionToScaleNames[pattern] ?? []
+		i = mod12(-i);
 
     let prefix = ""
     if (displayMode === "notes") {
       prefix = notes[mod12(root + i)] + " "
     } else if (displayMode === "functions") {
-      prefix = romanNumerals[i] + " "
+      prefix = romanNumerals[mod12(i)] + " "
     }
 
     return { i, prefix, chords, scales }
